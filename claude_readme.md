@@ -11,6 +11,8 @@ This repository contains code for training LoRA (Low-Rank Adaptation) models for
 - [Training Examples](#training-examples)
 - [Checkpoints](#checkpoints)
 - [Using Trained Models](#using-trained-models)
+- [Codebase Summary](#codebase-summary)
+- [Development History](#development-history)
 
 ## Installation
 
@@ -171,6 +173,11 @@ python train_wan_lora.py --dataset ./my_videos --output_dir ./outputs --control_
 python train_wan_lora.py --dataset ./my_videos --output_dir ./outputs --gradient_checkpointing
 ```
 
+### Training with CFG Distillation
+```bash
+python train_wan_lora.py --dataset ./my_videos --output_dir ./outputs --distill_cfg 1.0
+```
+
 ## Checkpoints
 
 Checkpoints are saved in the specified output directory with the following structure:
@@ -205,6 +212,73 @@ For integrating with Comfy UI:
 python convert_lora_to_comfy.py --input_lora ./outputs/YYYY-MM-DD_HH-MM-SS/checkpoints/wan-lora-00000100.safetensors --output_lora ./comfy_lora.safetensors
 ```
 
+## Codebase Summary
+
+### Main Training and Inference Files
+
+- **train_wan_lora.py**: Core training script for creating LoRA adaptations, handles dataset loading, model initialization, and training workflow.
+  
+- **test_wan_control_lora.py**: Testing script for using trained LoRA models, supports both text-to-video generation and control-based video transformations.
+
+- **convert_lora_to_comfy.py**: Utility to convert trained LoRAs to ComfyUI-compatible format by adjusting key prefixes.
+
+### Utility Modules
+
+- **utils/dataset.py**: Implements the `CombinedDataset` class for handling both image and video data, with resolution bucketing and frame sampling.
+  
+- **utils/temp_rng.py**: Context manager for temporarily setting random seeds to ensure consistent validation results.
+
+### Wan Model Core Components
+
+- **wan/text2video.py** & **wan/image2video.py**: Implementations for text-to-video and image-to-video generation.
+  
+- **wan/modules/model.py**: Core diffusion model implementation with transformer-based architecture.
+  
+- **wan/modules/vae.py**: Video Autoencoder for compressing videos to and from latent space.
+  
+- **wan/modules/t5.py**: UMT5 text encoder for processing text prompts into embeddings.
+  
+- **wan/modules/clip.py**: CLIP vision encoder for I2V models.
+  
+- **wan/modules/attention.py**: Attention mechanisms for transformer models.
+  
+- **wan/utils/fm_solvers*.py**: Flow matching solvers for diffusion process.
+  
+- **wan/configs/**: Configuration files for different model sizes and architectures.
+
+### Embeddings
+
+- **embeddings/**: Pre-computed negative prompt embeddings used for classifier-free guidance during training and inference.
+
+## Development History
+
+The repository has evolved through several development phases:
+
+### Initial Setup (March 1, 2025)
+- Initial repository setup
+- Added Wan model source code
+- Created dataset handling utilities
+
+### Model Support (March 4, 2025)
+- Cleaned up model code
+- Added PEFT (Parameter-Efficient Fine-Tuning) support for LoRA training
+- Updated import order and requirements
+- Implemented 1.3B model training functionality
+- Added ComfyUI conversion script
+
+### Advanced Training Features (March 6, 2025)
+- Added CFG distillation training capabilities
+- Implemented gradient checkpointing for memory optimization
+- Added negative embeddings for guided training
+- Enhanced model performance
+
+### Final Refinements (March 10-13, 2025)
+- Completed training implementation
+- Added testing functionality
+- Added control-based LoRA support
+- Implemented video transformation capabilities
+- Updated documentation
+
 ---
 
-*This readme was generated to provide more detailed documentation for the WanTraining codebase.*
+*This readme provides a comprehensive guide for WanTraining, a repository focused on fine-tuning the Wan AI video generation models using LoRA technique.*
